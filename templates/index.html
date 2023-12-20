@@ -22,12 +22,83 @@
 
             flex-direction: column;
         }
+
+        label {
+            display: block;
+        }
+
+        label > input{ /* HIDE RADIO */
+            visibility: hidden; /* Makes input not-clickable */
+            position: absolute; /* Remove input from document flow */
+        }
+
+        #submit-btn {
+            display: block;
+            margin: auto;
+            width: 95%;
+            background-color: white;
+            border: 1px solid #3559E0;
+            border-radius: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            margin-top: 0.7rem;
+            font-weight: 700;
+            color: #3559E0;
+        }
+
+        #submit-btn:disabled {
+            display: none;
+        }
+
+        #submit-btn:hover {
+            animation: mymove 0.3s forwards;
+            color: white;
+        }
+
+        @keyframes mymove {
+            from {background-color: white;}
+            to {background-color: #3559E0;}
+        }
     </style>
 </head>
 <body>
-    <h1>복면가왕 투표 결과</h1>
-    <a class="btn btn-dark btn-lg fw-bold" href="/result" role="button">결과 확인</a>
+    <h1 class="fw-bolder">{{first}} vs {{last}}</h1>
+    <form action="" method="post">
+        <div>
+            <label class="btn btn-outline-dark btn-lg px-5 m-2" role="button" id="input1">
+                <input type="radio" name="vote" value="{{first}}" />
+                <div>{{first}}</div>
+            </label>
+    
+            <label class="btn btn-outline-dark btn-lg px-5 m-2" role="button" id="input2">
+                <input type="radio" name="vote" value="{{last}}" />
+                <div>{{last}}</div>
+            </label>
+        </div>
+
+        <button type="submit" id="submit-btn" disabled>제출하기</button>
+    </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script>
+        var firstElement = document.querySelector("input[value={{first}}]");
+        var secondElement = document.querySelector("input[value={{last}}]");
+
+        function checkBtnState() {
+            document.getElementById('submit-btn').removeAttribute("disabled"); 
+
+            if (firstElement.checked) {
+                document.getElementById('input1').className = 'btn btn-dark btn-lg px-5 m-2 fw-bold';
+                document.getElementById('input2').className = 'btn btn-outline-dark btn-lg px-5 m-2';
+            } else if (secondElement.checked) {
+                document.getElementById('input2').className = 'btn btn-dark btn-lg px-5 m-2 fw-bold';
+                document.getElementById('input1').className = 'btn btn-outline-dark btn-lg px-5 m-2';
+            }
+        }
+
+        firstElement.addEventListener('change', (() => {checkBtnState()}));
+        secondElement.addEventListener('change', (() => {checkBtnState()}));
+    </script>
 </body>
 </html>

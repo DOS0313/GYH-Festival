@@ -1,77 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>투표 결과 조회</title>
 
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-        }
+  <style>
+    @font-face {
+      font-family: 'seolleimcool-SemiBold';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/seolleimcool-SemiBold.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
 
-        canvas {
-            z-index: 999;
-            height: 100vh !important;
-        }
-    </style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+
+      font-family: 'seolleimcool-SemiBold';
+    }
+
+    #result {
+      display: none;
+      z-index: 3;
+      position: fixed;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      font-size: 168px;
+      flex-direction: column;
+      transition: background-color 3s, color 3s;
+    }
+
+    #result button {
+      cursor: pointer;
+      display: block;
+      font-weight: 700;
+      font-size: medium;
+      background-color: white;
+      color: black;
+      border: 0;
+      border-radius: 3px;
+      padding: 3px 8px;
+      transition: background-color 3s, color 3s;
+      margin-top: 30px;
+    }
+
+    canvas {
+      height: 100vh !important;
+    }
+  </style>
 </head>
+
 <body>
-    <canvas id="chart"></canvas>
+  <canvas id="chart"></canvas>
 
-    <!-- <div class="result"></div> -->
+  <div id="result">{{winner}}<br /><span style="font-size: large;">{% for key, item in result.items() %}{{key}}:
+      {{item}}<br />{% endfor %}</span><button id="close-btn">닫기</button></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 
-    <script>
-        function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+  <script>
+    function sleep(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    }
 
-        const ctx = document.getElementById('chart');
-        var resultArr = {{result|tojson}};
-        const resultData = [{% for data in result %}'{{ result[data] }}',{% endfor %}];
-      
-        var chart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: [{% for data in result %}'{{data}}',{% endfor %}],
-            datasets: [{
-              label: '투표 결과 (참가자 수: {{ count }})',
-              data: resultData,
-              borderWidth: 0.5
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    Chart.defaults.color = "#000";
+
+    const ctx = document.getElementById('chart');
+    var resultArr = {{ result| tojson}};
+    const resultData = [{% for data in result %}'{{ result[data] }}', {% endfor %}];
+
+    var chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [{% for data in result %}'{{data}}',{% endfor %}],
+      datasets: [{
+        label: '투표 결과 (참가자 수: {{ count }})',
+        data: resultData,
+        borderWidth: 0.5
+      }]
+    },
+    options: {
+      responsive: true,
+        maintainAspectRatio: false,
+          scales: {
+            x: {
+              ticks: {
+                font: {
+                  size: 36,
+                }
               }
-            }
+            },
+            y: {
+              grid: {
+                display: false
+              },
+            beginAtZero: true
           }
-        });
+        }
+      }
+    });
 
-        let counter = 0;
-        var originalData = _.cloneDeep(chart.data.datasets[0].data);
+    let counter = 0;
+    var originalData = _.cloneDeep(chart.data.datasets[0].data);
 
-        const interval = setInterval(() => {
-            chart.data.datasets[0].data[0] = getRandomInt(1, {{count}});
-            chart.data.datasets[0].data[1] = getRandomInt(1, {{count}});
-            chart.update();
-            counter++;
+    const interval = setInterval(() => {
+      chart.data.datasets[0].data[0] = getRandomInt(1, {{ count }});
+    chart.data.datasets[0].data[1] = getRandomInt(1, {{ count }});
+    chart.update();
+    counter++;
 
-            if (counter === 30) {
-            chart.data.datasets[0].data = originalData;
-            chart.update();
-            clearInterval(interval);
-            }
-        }, 200);
+    if (counter === 30) {
+      chart.data.datasets[0].data = originalData;
+      chart.update();
+      sleep(2000);
+      document.getElementById('result').style.display = 'flex';
+      clearInterval(interval);
+    }
+}, 200);
 
-      </script>
+    document.getElementById('close-btn').addEventListener('click', () => {
+      document.getElementById('result').style.visibility = 'hidden';
+    });
+  </script>
 </body>
+
 </html>
