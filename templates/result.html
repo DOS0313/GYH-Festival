@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            z-index: 999;
+            height: 100vh !important;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="chart"></canvas>
+
+    <!-- <div class="result"></div> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+    <script>
+        function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        const ctx = document.getElementById('chart');
+        var resultArr = {{result|tojson}};
+        const resultData = [{% for data in result %}'{{ result[data] }}',{% endfor %}];
+      
+        var chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [{% for data in result %}'{{data}}',{% endfor %}],
+            datasets: [{
+              label: '투표 결과 (참가자 수: {{ count }})',
+              data: resultData,
+              borderWidth: 0.5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+        let counter = 0;
+        var originalData = _.cloneDeep(chart.data.datasets[0].data);
+
+        const interval = setInterval(() => {
+            chart.data.datasets[0].data[0] = getRandomInt(1, {{count}});
+            chart.data.datasets[0].data[1] = getRandomInt(1, {{count}});
+            chart.update();
+            counter++;
+
+            if (counter === 30) {
+            chart.data.datasets[0].data = originalData;
+            chart.update();
+            clearInterval(interval);
+            }
+        }, 200);
+
+      </script>
+</body>
+</html>
