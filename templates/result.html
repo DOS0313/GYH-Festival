@@ -60,7 +60,7 @@
 <body>
   <canvas id="chart"></canvas>
 
-  <div id="result">{{winner}}<br /><span style="font-size: xx-large;">{% for key, item in result.items() %}{{key}}:
+  <div id="result">{{winner}}<br /><span style="font-size: xx-large;">{% for key, item in result.items() %}{{key.replace('_', ' ')}}:
       {{item}}<br />{% endfor %}</span><button id="close-btn">닫기</button></div>
 
   <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
@@ -84,7 +84,7 @@
     var chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: [{% for data in result %}'{{data}}',{% endfor %}],
+        labels: [{% for data in result %}'{{ data.replace('_', ' ') }}',{% endfor %}],
         datasets: [{
           label: '투표 결과 (참가자 수: {{ count }})',
           backgroundColor: ['#f2c5de', '#c6def1', '#f7d9c4', '#dbcdf0'],

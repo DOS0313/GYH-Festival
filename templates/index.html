@@ -66,8 +66,8 @@
     <form action="" method="post">
         <div>
             {% for person in people %}
-            <label class="btn btn-outline-dark btn-lg px-5 m-2" role="button" id="{{person}}">
-                <input type="radio" name="vote" value="{{person}}" />
+            <label class="btn btn-outline-dark btn-lg px-5 m-2" role="button" id="{{person.replace(' ', '_') }}">
+                <input type="radio" name="vote" value="{{person.replace(' ', '_')}}" />
                 <div>{{person}}</div>
             </label>
             {% endfor %}
@@ -80,24 +80,24 @@
 
     <script>
         {% for person in people %}
-        var {{person}}Element = document.querySelector("input[value={{person}}]");
+        var {{person.replace(' ', '_') }}Element = document.querySelector("input[value={{person.replace(' ', '_')}}]");
         {% endfor %}
 
         function checkBtnState() {
             document.getElementById('submit-btn').removeAttribute("disabled"); 
 
             {% for person in people %}
-            if ({{person}}Element.checked) {
+            if ({{person.replace(' ', '_')}}Element.checked) {
                 {% for default_person in people %}
-                document.getElementById('{{default_person}}').className = 'btn btn-outline-dark btn-lg px-5 m-2';
+                document.getElementById('{{default_person.replace(' ', '_') }}').className = 'btn btn-outline-dark btn-lg px-5 m-2';
                 {% endfor %}
-                document.getElementById('{{person}}').className = 'btn btn-dark btn-lg px-5 m-2 fw-bold';
+                document.getElementById('{{ person.replace(' ', '_') }}').className = 'btn btn-dark btn-lg px-5 m-2 fw-bold';
             }
             {% endfor %}
         }
 
         {% for person in people %}
-        {{person}}Element.addEventListener('change', (() => {checkBtnState()}));
+        {{person.replace(' ', '_') }}Element.addEventListener('change', (() => {checkBtnState()}));
         {% endfor %}
     </script>
 </body>

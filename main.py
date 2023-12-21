@@ -66,10 +66,10 @@ def result_check():
 if __name__ == '__main__':
     if not os.path.isfile('result.json'):
         with open('result.json', 'w', encoding='utf-8') as f:
-            dump_data = OrderedDict()
+            replaced_people = OrderedDict()
             for person in 사람들:
-                dump_data[person] = 0
+                replaced_people[person.replace(' ', '_')] = 0
 
-            json.dump(dump_data, f, ensure_ascii=False, indent='\t')
+            json.dump(replaced_people, f, ensure_ascii=False, indent='\t')
 
     app.run(host='0.0.0.0', port=80)
