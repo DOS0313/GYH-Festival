@@ -176,4 +176,7 @@ pyrightconfig.json
 # Pycharm
 .idea/
 
+# our File
+result.json
+
 # End of https://www.toptal.com/developers/gitignore/api/python
