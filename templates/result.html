@@ -9,7 +9,7 @@
   <style>
     @font-face {
       font-family: 'seolleimcool-SemiBold';
-      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/seolleimcool-SemiBold.woff2') format('woff2');
+      src: url('{{ url_for('static', filename='fonts/seolleimcool-SemiBold.woff2') }}') format('woff2');
       font-weight: normal;
       font-style: normal;
     }
@@ -60,11 +60,11 @@
 <body>
   <canvas id="chart"></canvas>
 
-  <div id="result">{{winner}}<br /><span style="font-size: large;">{% for key, item in result.items() %}{{key}}:
+  <div id="result">{{winner}}<br /><span style="font-size: xx-large;">{% for key, item in result.items() %}{{key}}:
       {{item}}<br />{% endfor %}</span><button id="close-btn">닫기</button></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/lodash.min.js') }}"></script>
 
   <script>
     function sleep(ms) {
@@ -77,35 +77,37 @@
 
     Chart.defaults.color = "#000";
 
-    const ctx = document.getElementById('chart');
-    var resultArr = {{ result| tojson}};
+    var ctx = document.getElementById('chart');
+    var resultArr = {{ result | tojson }};
     const resultData = [{% for data in result %}'{{ result[data] }}', {% endfor %}];
 
     var chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: [{% for data in result %}'{{data}}',{% endfor %}],
-      datasets: [{
-        label: '투표 결과 (참가자 수: {{ count }})',
-        data: resultData,
-        borderWidth: 0.5
-      }]
-    },
-    options: {
-      responsive: true,
+        datasets: [{
+          label: '투표 결과 (참가자 수: {{ count }})',
+          backgroundColor: ['#f2c5de', '#c6def1', '#f7d9c4', '#dbcdf0'],
+          data: resultData,
+          borderWidth: 0.5
+        }]
+      },
+
+      options: {
+        responsive: true,
         maintainAspectRatio: false,
-          scales: {
-            x: {
-              ticks: {
-                font: {
-                  size: 36,
-                }
+        scales: {
+          x: {
+            ticks: {
+              font: {
+                size: 36,
               }
+            }
+          },
+          y: {
+            grid: {
+              display: false
             },
-            y: {
-              grid: {
-                display: false
-              },
             beginAtZero: true
           }
         }
@@ -116,19 +118,20 @@
     var originalData = _.cloneDeep(chart.data.datasets[0].data);
 
     const interval = setInterval(() => {
-      chart.data.datasets[0].data[0] = getRandomInt(1, {{ count }});
-    chart.data.datasets[0].data[1] = getRandomInt(1, {{ count }});
-    chart.update();
-    counter++;
-
-    if (counter === 30) {
-      chart.data.datasets[0].data = originalData;
+      {% for i in range(len(people)) %}
+      chart.data.datasets[0].data[{{i}}] = getRandomInt(0, {{ count }});
+      {% endfor %}
       chart.update();
-      sleep(2000);
-      document.getElementById('result').style.display = 'flex';
-      clearInterval(interval);
-    }
-}, 200);
+      counter++;
+
+      if (counter === 30) {
+        chart.data.datasets[0].data = originalData;
+        chart.update();
+        sleep(2000);
+        document.getElementById('result').style.display = 'flex';
+        clearInterval(interval);
+      }
+    }, 200);
 
     document.getElementById('close-btn').addEventListener('click', () => {
       document.getElementById('result').style.visibility = 'hidden';
