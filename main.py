@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, redirect
 import json
 import hashlib
 import os
@@ -8,23 +8,19 @@ from collections import OrderedDict
 app = Flask(__name__)
 
 
-def allname() -> str:
-    name_all = str()
-    for person in 사람들:
-        name_all.join(person)
-
-    return name_all
+def nameall() -> str:
+    return hashlib.md5(str(f'{사람들}{제목}').encode()).hexdigest()
 
 
 @app.route('/', methods=["GET", "POST"])
 def vote():
-    name_hash = hashlib.md5(allname().encode()).hexdigest()
+    name_hash = nameall()
 
     if request.cookies.get(name_hash) == '1':
         return render_template('message.html', icon='error', message='이미 투표하셨습니다.')
 
     if request.method == "GET":
-        return render_template('index.html', people=사람들)
+        return render_template('index.html', people=사람들, title=제목)
 
     elif request.method == "POST":
         voted = request.form['vote']
@@ -38,7 +34,7 @@ def vote():
 
         resp = make_response(render_template('message.html', icon='success', message='투표 완료'))
 
-        name_hash = hashlib.md5(allname().encode()).hexdigest()
+        name_hash = hashlib.md5(name_hash.encode()).hexdigest()
         resp.set_cookie(name_hash, '1')
 
         return resp
@@ -61,6 +57,11 @@ def result_check():
 
     return render_template('result.html', result=json_data, count=participants_count, winner=winner,
                            len=len, people=사람들)
+
+
+@app.errorhandler(KeyError)
+def key_error():
+    return redirect('vote')
 
 
 if __name__ == '__main__':
