@@ -55,9 +55,9 @@ def result_check():
     for key, items in dict_data.items():
         participants_count += items
 
-    # 맥스값 찾아서 우승 띄우게
-    max_member = max(사람들)  # 사람 이름으로 나옴
-    winner = f"{max_member} 우승"
+    max_member = [k for k,v in dict_data.items() if max(dict_data.values()) == v]  # 사람 이름으로 나옴
+    winner_text = str(max_member).replace('_', ' ').replace('[', '').replace(']', '').replace("'", '"')
+    winner = f"{winner_text} 우승"
 
     return render_template('result.html', result=json_data, count=participants_count, winner=winner,
                            len=len, people=사람들)
